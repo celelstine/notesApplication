@@ -1,44 +1,87 @@
-class Note{
+/**
+ * A NoteApplication to create, edit, search and delete notes
+ * @Author okorocelstine@gmail.com (Okoro Celestine)
+ */
+
+ /**
+  * Class for notes
+  * @param {int} note_id An unique identify for each note. 
+  * @param {string} author The name of the writer of a note. 
+  * @param {string } content The write-up of an auhtor. 
+  * @construct Check the datatype of each value
+  */
+class note{
 	constructor(note_id, author,content) {
-		this.note_id=note_id;
-		this.content=content;
-		this.author=author;
+		var status="";
+		if ( (typeof note_id) != "number" || (typeof author) != "string" || (typeof content) != "string" ) {
+			status = "Error,  check your parameters. Eg--> note(189,\"yourname\",\"your write-up\")";
+			return status;
+		}else {
+			this.note_id=note_id;
+			this.author=author;
+			this.content=content;
+		}
+	
 
 	}
 }
 
-
+ /**
+  * Class to manipulate notes, that is object from the note class
+  * @coonsrtuct Create a collection to hold notes.
+  */
 class NotesApplication {
 
 	constructor() {
-		
 		this.notes=[];
 	}
 
-
+	/** Add a new note to the current note collection
+	 *  @param {note} note_content An object of the note class 
+	 **/
 
 	 create(note_content) {
-	
-		this.notes.push(note_content);
+	 	
+	 	try {
+	 		this.notes.push(note_content);
+	 		return "Note:" + note_content.note_id + " registered, by " + note_content.author + ".";
+	 	}
+	 	catch(err) {
+	 		return "Error occured, try again.";
+	 	}
+		
 	}
-
+	
+	/** List all note in the current note collection
+	 **/
 	 listNotes() {
 		var length= this.notes.length-1;
 		var index=0;
 		var list_notes="";
 		var current_note;
-		while(counter<=length) {
-			current_note=this.notes[index];
-			list_notes += "\n";
-			list_notes += "\n Note ID: " + current_note.note_id;
-			list_notes +="\n"+ current_note.content;
-			list_notes += "\n By Author " + current_note.author;
-			index++;
+		if(length<0) {
+			list_notes="No note registered, create a note and add it up";
+			return list_notes;
 		}
-		return list_notes;
+		else{
+			while(index<=length) {
+				current_note=this.notes[index];
+				list_notes += "\n";
+				list_notes += "\nNote ID: " + current_note.note_id;
+				list_notes +="\n"+ current_note.content;
+				list_notes += "\nBy Author " + current_note.author;
+				index++;
+			}
+			length +=1;
+			list_notes = length + " Note" + (length>1?"s":"") + " found" + list_notes;
+			return list_notes;
+		}
 
 	}
-
+	
+	/** Search for a note with the given ID 
+	 *  @param {number} note_id An ID of the note  
+	 **/
 	 get(note_id) {
 		var length= this.notes.length-1;
 		var index=0;
@@ -47,77 +90,111 @@ class NotesApplication {
 		while(index<=length) {
 			current_note=this.notes[index];
 			if (current_note.note_id == note_id) {
-				list_notes += "\n";
-				list_notes += "\n Note ID: " + current_note.note_id;
+				list_notes += "\nNote ID: " + current_note.note_id;
 				list_notes +="\n"+ current_note.content;
-				list_notes += "\n By Author " + current_note.author;
-				index++;
-			}
-			
-			
+				list_notes += "\nBy Author " + current_note.author;
+				return list_notes;
+			}	
+			index++;
 		}
-		return list_notes;
+		if(list_notes === "") {
+			list_notes = "No note found with ID:" + note_id;
+			return list_notes;
+		}
+		
+	
 
 	}
 
+	/** Search for notes with the given text
+	 *  @param {string} search_text The seaech text
+	 **/
 	 search(search_text) {
 		var length= this.notes.length-1;
 		var index=0;
 		var list_notes="";
 		var current_note;
 		var check_match=-1;
+		var found_notes=0;
 		while(index<=length) {
 			current_note=this.notes[index];
 			check_match=current_note.content.indexOf(search_text);
 			if (check_match>-1) {
 				list_notes += "\n";
-				list_notes += "\n Note ID: " + current_note.note_id;
+				list_notes += "\nNote ID: " + current_note.note_id;
 				list_notes +="\n"+ current_note.content;
-				list_notes += "\n By Author " + current_note.author;
-				index++;
-			}
-			
+				list_notes += "\nBy Author " + current_note.author;
+				found_notes++;
+			}	
+			index++;
 		}
-		return list_notes;
+		if(list_notes === "") {
+			list_notes = "No Note found with text:" + search_text;
+			return list_notes;
+		}else{
+			list_notes = found_notes + " Note" + (found_notes>1?"s":"") + " found \n" + list_notes;
+			return list_notes;
+		}
+		
 
 	}
-
+	
+	/** Delete a note with the given ID
+	 *  @param {number} note_id An ID of the note  
+	 **/
 	 delete(note_id) {
 		var length = this.notes.length-1;
 		var index=0;
 		var current_note;
+		var status="";
 		while(index<=length) {
 			current_note=this.notes[index];
-			if (current_note.note_id == counter) {
+			if (current_note.note_id == note_id) {
 				current_note=null;
+				status="Note: "+ note_id +" successfully deleted";
+				return status;
 			}
 			index++;
-			
 		}
-		return list_notes;
+		if(status === "") {
+			status = "No Note found with ID:" + note_id;
+			return status;
+		}
+		
 
 	}
-
-	 edit(note_id1, new_content) {
+	
+	/** Search for notes with the given ID and edit it's content
+	 * 	@para {number} note_id The ID of the note to edit
+	 *  @param {string} content The new content 
+	 **/
+	 edit(note_id, new_content) {
 		var length= this.notes.length-1;
 		var index=0;
 		var list_notes="";
 		var current_note;
 		while(index<=length) {
 			current_note=this.notes[index];
-			if (current_note.note_id == note_id1) {
-				list_notes += "\n";
-				list_notes += "\n Note ID: " + current_note.note_id;
+			if (current_note.note_id == note_id) {
+				list_notes += "Note ID: " + current_note.note_id;
 				current_note.content=new_content;
 				list_notes += "\n" + new_content;
-				list_notes += " \nBy Author " + current_note.author;
+				list_notes += "\nBy Author " + current_note.author;
+				return list_notes;
 			}
-			index++;
-			
+			index++;	
 		}
-		return list_notes;
-
+		if(list_notes === "") {
+			list_notes = "No Note found with ID:" + note_id;
+			return list_notes;
+		}
+		
 	}
-
 }
+var note1=new note(1,"Celestine","life is fair and fun");
+var note2 = new note(2,"mercy","Expres yourself now");
+var noteApp = new NotesApplication("");
+noteApp.create(note1);
+noteApp.create(note2);
+console.log(noteApp.search("life"));
 
